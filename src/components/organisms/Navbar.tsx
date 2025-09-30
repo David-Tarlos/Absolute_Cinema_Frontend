@@ -12,7 +12,7 @@ const Navbar = () => {
             justifyContent: "center",
             alignItems: "center"
         }}>
-            <Typography variant="h1" component="div">
+            <Typography variant="h1">
                 ABSOLUTE FILMORA
             </Typography>
 
