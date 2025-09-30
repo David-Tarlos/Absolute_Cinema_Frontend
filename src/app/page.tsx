@@ -1,3 +1,5 @@
+'use client';
+
 import Navbar from "@/components/organisms/Navbar";
 import {Box} from "@mui/system";
 import Image from "next/image";
@@ -15,7 +17,6 @@ export default function Home() {
                 alignItems: "center"
             }}>
                 <Image src={AbsoluteFilmora} alt="Absolute Filmora" />
-
             </Box>
         </>
 
