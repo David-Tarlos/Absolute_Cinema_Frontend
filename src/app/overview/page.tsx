@@ -1,69 +1,76 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // <-- import
 import MovieCard from "@/components/atoms/MovieCard";
-import { Grid, Typography } from "@mui/material";
-import {Box} from "@mui/system";
+import { Grid, Typography, Box } from "@mui/material";
+import { MovieResponseDTO, getAllMovies } from "@/service/movieService";
 import '../globals.css';
 
-interface Movie {
-    id: number;
-    title: string;
-    poster: string;
-    overview: string;
-    releaseDate: string;
-    showtimes: string[];
-    price: number;
-    availableSeats: number;
-}
-
 export default function CinemaOverview() {
-    const [movies, setMovies] = useState<Movie[]>([]);
+    const [movies, setMovies] = useState<MovieResponseDTO[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const getImageUrl = (path?: string, size: string = "w500") =>
+        path ? `https://image.tmdb.org/t/p/${size}${path}` : "/placeholder.png";
+
+    const router = useRouter();
+
     useEffect(() => {
-        async function fetchMovies() {
+        const fetchMovies = async () => {
             try {
-                const res = await fetch("http://localhost:5000/movies/now_playing");
-                const data = await res.json();
-                setMovies(data.results || []);
-            } catch (err) {
-                console.error("Error fetching movies", err);
+                const moviePage = await getAllMovies(0, 20);
+                setMovies(moviePage.content);
+            } catch (error) {
+                console.error("Failed to fetch movies:", error);
             } finally {
                 setLoading(false);
             }
-        }
+        };
+
         fetchMovies();
     }, []);
 
     if (loading) {
-        return <Typography variant="h5" align="center" sx={{ mt: 10 }}>Loading movies...</Typography>;
+        return (
+            <Typography
+                variant="h5"
+                align="center"
+                sx={{ mt: 10, color: "white" }}
+            >
+                Loading movies...
+            </Typography>
+        );
     }
 
     return (
         <Box sx={{
             backgroundColor: "#36304E",
-            height: "100vh",
+            minHeight: "100vh",
+            py: 6,
             display: "flex",
-            justifyContent: "center",
-
+            justifyContent: "center"
         }}>
-        <Box sx={{ p: 4 }}>
-            <Typography variant="h3" align="center" gutterBottom>Now Showing 🎬</Typography>
-            <Grid container spacing={4} justifyContent="center">
-                {movies.map((movie) => (
-                    <Grid item key={movie.id}>
-                        <MovieCard
-                            path={movie.poster}
-                            title={movie.title}
-                            onClick={() => {
-                                alert(`Selected: ${movie.title}\nShowtimes: ${movie.showtimes.join(", ")}`);
-                            }}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
-        </Box>
+            <Box sx={{ p: 4, width: '100%', maxWidth: 1400 }}>
+                <Typography
+                    variant="h3"
+                    align="center"
+                    gutterBottom
+                    sx={{ color: "white", mb: 6 }}
+                >
+                    Now Showing 🎬
+                </Typography>
+
+                <Grid container spacing={4}>
+                    {movies.map((movie) => (
+                            <MovieCard
+                                key={movie.id}
+                                path={getImageUrl(movie.posterPath)}
+                                onClick={() => router.push(`/movie/${movie.id}`)}
+                            />
+                    ))}
+                </Grid>
+            </Box>
         </Box>
     );
 }
