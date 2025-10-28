@@ -30,6 +30,8 @@ const CastCard = ({ actor }: { actor: CastDto }) => (
             color: "#fff",
             border: "1px solid #333",
             textAlign: "center",
+            minHeight: 200,
+            height: "100%",
             transition: "transform 0.3s",
             "&:hover": { transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(255,255,255,0.1)" },
         }}
