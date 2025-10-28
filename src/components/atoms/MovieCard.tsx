@@ -1,36 +1,29 @@
 'use client';
 
 import {Box} from "@mui/system";
-import Image, {StaticImageData} from "next/image";
-import {Typography} from "@mui/material";
 
 interface CardProps {
-    path: string | StaticImageData;
-    title: string;
+    path: string;
     onClick: () => void;
 }
 
-export default function MovieCard({path, title, onClick}: Readonly<CardProps>) {
+export default function MovieCard({path, onClick}: Readonly<CardProps>) {
     return (
-        <Box sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            gap: "5px",
-            padding: "10px",
-            border: "1px solid black",
-            borderRadius: "25px",
-            backgroundColor: "white",
-        }}
-             onClick={onClick}
-        >
-            <Image src={path} alt={title + "-image"} width={200} height={200} />
-            <Typography variant="h6" component="div" color={"textSecondary"}>
-                {title}
-            </Typography>
-
-        </Box>
-
-    );
+        <Box
+            component="img"
+            src={path}
+            sx={{
+                width: { xs: "100%", md: 300 },
+                borderRadius: 3,
+                boxShadow: "0 8px 20px rgba(0,0,0,0.6)",
+                cursor: "pointer",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease", // smooth hover effect
+                "&:hover": {
+                    transform: "scale(1.05)", // slightly bigger
+                    boxShadow: "0 12px 30px rgba(0,0,0,0.8)", // deeper shadow
+                },
+            }}
+            onClick={onClick}
+        />
+    )
 }
