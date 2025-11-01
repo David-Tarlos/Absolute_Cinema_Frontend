@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
     Box,
     Typography,
@@ -14,6 +14,7 @@ import {
     Card,
     CardContent,
     IconButton,
+    Button,
 } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import { MovieResponseDTO, getMovieById } from "@/service/movieService";
@@ -56,6 +57,7 @@ const CastCard = ({ actor }: { actor: CastDto }) => (
 
 const MovieDetailPage = () => {
     const { id } = useParams();
+    const router = useRouter();
     const [movie, setMovie] = useState<MovieResponseDTO | null>(null);
     const [cast, setCast] = useState<CastDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -165,6 +167,24 @@ const MovieDetailPage = () => {
                                     {movie.overview}
                                 </Typography>
                             )}
+
+                            <Button
+                                variant="contained"
+                                size="large"
+                                onClick={() => router.push(`/overview/reservation?movieId=${movie.id}`)}
+                                sx={{
+                                    mt: 3,
+                                    backgroundColor: '#4CAF50',
+                                    '&:hover': {
+                                        backgroundColor: '#45a049',
+                                    },
+                                    padding: '12px 32px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                Reserve Seats
+                            </Button>
                         </Stack>
                     </Box>
                 </Box>
