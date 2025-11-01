@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Button, Grid, CircularProgress, Alert } from "@mui/material";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import '../../globals.css';
 import { getMovieById, MovieResponseDTO } from "@/service/movieService";
 import {
@@ -67,6 +67,7 @@ function Seat({ id, seatNumber, status, isWheelchair, onClick }: SeatProps) {
 
 export default function ReservationPage() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const movieId = searchParams.get('movieId');
 
     const [movie, setMovie] = useState<MovieResponseDTO | null>(null);
@@ -162,36 +163,19 @@ export default function ReservationPage() {
     };
 
     const handleBooking = async () => {
-        if (!selectedScreening || selectedSeats.length === 0) return;
+        if (!selectedScreening || selectedSeats.length === 0 || !movie) return;
 
-        try {
-            setLoading(true);
-            await createReservation({
-                screeningId: selectedScreening.id,
-                seatIds: selectedSeats.map(s => s.id),
-            });
-            setBookingSuccess(true);
-            // Refresh seats to update availability
-            const updatedSeats = await getSeatsByScreening(selectedScreening.id);
-            setSeats(updatedSeats);
-            setSelectedSeats([]);
-        } catch (err) {
-            console.error("Booking API Error:", err);
-            // Mock booking success for demo
-            setBookingSuccess(true);
-            setError(null);
-            // Mark selected seats as occupied in mock mode
-            const updatedSeats = seats.map(seat => {
-                if (selectedSeats.find(s => s.id === seat.id)) {
-                    return { ...seat, isReserved: true, isAvailable: false };
-                }
-                return seat;
-            });
-            setSeats(updatedSeats);
-            setSelectedSeats([]);
-        } finally {
-            setLoading(false);
-        }
+        // Redirect to payment page with booking details
+        const seatsList = selectedSeats.map(s => `${s.row}${s.seatNumber}`).join(', ');
+        const params = new URLSearchParams({
+            movieTitle: movie.title,
+            seats: seatsList,
+            total: totalPrice.toFixed(2),
+            screeningTime: selectedScreening.screeningTime,
+            roomNumber: selectedScreening.roomNumber.toString(),
+        });
+
+        router.push(`/overview/payment?${params.toString()}`);
     };
 
     const totalPrice = selectedScreening
