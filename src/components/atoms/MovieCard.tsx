@@ -7,7 +7,7 @@ interface CardProps {
     onClick: () => void;
 }
 
-export default function MovieCard({path, onClick}: Readonly<CardProps>) {
+ const MovieCard = ({path, onClick}: Readonly<CardProps>)=> {
     return (
         <Box
             component="img"
@@ -27,3 +27,5 @@ export default function MovieCard({path, onClick}: Readonly<CardProps>) {
         />
     )
 }
+
+export default MovieCard;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import {useEffect, useState, useRef} from "react";
 import {
     Box,
     Typography,
@@ -14,15 +14,17 @@ import {
     Card,
     CardContent,
     IconButton,
+    Button,
 } from "@mui/material";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
-import { MovieResponseDTO, getMovieById } from "@/service/movieService";
-import { CastDto, getCastByMovieId } from "@/service/castService";
+import {ArrowBackIos, ArrowForwardIos} from "@mui/icons-material";
+import {MovieResponseDTO, getMovieById} from "@/service/movieService";
+import {CastDto, getCastByMovieId} from "@/service/castService";
+import Navbar from "@/components/organisms/Navbar";
 
 const getImageUrl = (path?: string, size: string = "w500") =>
     path ? `https://image.tmdb.org/t/p/${size}${path}` : "/placeholder.png";
 
-const CastCard = ({ actor }: { actor: CastDto }) => (
+const CastCard = ({actor}: { actor: CastDto }) => (
     <Card
         sx={{
             width: 140,
@@ -33,15 +35,15 @@ const CastCard = ({ actor }: { actor: CastDto }) => (
             minHeight: 200,
             height: "100%",
             transition: "transform 0.3s",
-            "&:hover": { transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(255,255,255,0.1)" },
+            "&:hover": {transform: "scale(1.05)", boxShadow: "0 8px 20px rgba(255,255,255,0.1)"},
         }}
     >
         <Avatar
             src={getImageUrl(actor.profilePath)}
             alt={actor.name}
-            sx={{ width: 120, height: 120, mx: "auto", mt: 1, border: "2px solid #1976d2" }}
+            sx={{width: 120, height: 120, mx: "auto", mt: 1, border: "2px solid #1976d2"}}
         />
-        <CardContent sx={{ p: 1 }}>
+        <CardContent sx={{p: 1}}>
             <Typography variant="body2" fontWeight="bold">
                 {actor.name}
             </Typography>
@@ -55,7 +57,8 @@ const CastCard = ({ actor }: { actor: CastDto }) => (
 );
 
 const MovieDetailPage = () => {
-    const { id } = useParams();
+    const {id} = useParams();
+    const router = useRouter();
     const [movie, setMovie] = useState<MovieResponseDTO | null>(null);
     const [cast, setCast] = useState<CastDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -82,13 +85,13 @@ const MovieDetailPage = () => {
         if (!castContainerRef.current) return;
         const container = castContainerRef.current;
         const scrollAmount = container.clientWidth * 0.8; // scroll ~80% of visible width
-        container.scrollBy({ left: direction === "left" ? -scrollAmount : scrollAmount, behavior: "smooth" });
+        container.scrollBy({left: direction === "left" ? -scrollAmount : scrollAmount, behavior: "smooth"});
     };
 
     if (loading)
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
-                <CircularProgress color="secondary" />
+            <Box sx={{display: "flex", justifyContent: "center", py: 10}}>
+                <CircularProgress color="secondary"/>
             </Box>
         );
 
@@ -100,18 +103,17 @@ const MovieDetailPage = () => {
         );
 
     return (
-        <Box sx={{ minHeight: "100vh", backgroundColor: "#0d0d0d", color: "#fff", pb: 6 }}>
+        <><Navbar details={true}/><Box sx={{minHeight: "100vh", backgroundColor: "#0d0d0d", color: "#fff", pb: 6}}>
             <Container maxWidth="lg">
                 {/* Backdrop */}
                 {movie.backdropPath && (
-                    <Box sx={{ position: "relative", borderRadius: 2, overflow: "hidden", mb: 6 }}>
+                    <Box sx={{position: "relative", borderRadius: 2, overflow: "hidden", mb: 6}}>
                         <Box
                             component="img"
                             src={getImageUrl(movie.backdropPath, "original")}
                             alt={movie.title}
-                            sx={{ width: "100%", maxHeight: 450, objectFit: "cover", filter: "brightness(0.5)" }}
-                        />
-                        <Box sx={{ position: "absolute", bottom: 16, left: 16, color: "#fff" }}>
+                            sx={{width: "100%", maxHeight: 450, objectFit: "cover", filter: "brightness(0.5)"}}/>
+                        <Box sx={{position: "absolute", bottom: 16, left: 16, color: "#fff"}}>
                             <Typography variant="h2" fontWeight="bold">
                                 {movie.title}
                             </Typography>
@@ -125,10 +127,10 @@ const MovieDetailPage = () => {
                 )}
 
                 {/* Movie Info */}
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4, mb: 4 }}>
+                <Box sx={{display: "flex", flexDirection: {xs: "column", md: "row"}, gap: 4, mb: 4}}>
                     {movie.posterPath && (
-                        <Box sx={{ width: { xs: "100%", md: 300 }, flexShrink: 0 }}>
-                            <CastCard actor={{ name: movie.title, profilePath: movie.posterPath, id: -1 }} />
+                        <Box sx={{width: {xs: "100%", md: 300}, flexShrink: 0}}>
+                            <CastCard actor={{name: movie.title, profilePath: movie.posterPath, id: -1}}/>
                         </Box>
                     )}
 
@@ -139,8 +141,7 @@ const MovieDetailPage = () => {
                                     <Chip
                                         key={genre.id}
                                         label={genre.name}
-                                        sx={{ bgcolor: "#1a1a1a", color: "#90caf9", border: "1px solid #1976d2" }}
-                                    />
+                                        sx={{bgcolor: "#1a1a1a", color: "#90caf9", border: "1px solid #1976d2"}}/>
                                 ))}
                             </Stack>
 
@@ -150,12 +151,14 @@ const MovieDetailPage = () => {
                                 {movie.originalLanguage && (
                                     <Typography>Language: {movie.originalLanguage.toUpperCase()}</Typography>
                                 )}
-                                {movie.popularity && <Typography>Popularity: {Math.round(movie.popularity)}</Typography>}
+                                {movie.popularity &&
+                                    <Typography>Popularity: {Math.round(movie.popularity)}</Typography>}
                             </Stack>
 
                             {movie.voteAverage !== undefined && (
                                 <Stack direction="row" alignItems="center" spacing={1}>
-                                    <Rating value={movie.voteAverage / 2} precision={0.5} readOnly sx={{ color: "#ffb400" }} />
+                                    <Rating value={movie.voteAverage / 2} precision={0.5} readOnly
+                                            sx={{color: "#ffb400"}}/>
                                     <Typography>{movie.voteAverage}/10</Typography>
                                 </Stack>
                             )}
@@ -165,12 +168,30 @@ const MovieDetailPage = () => {
                                     {movie.overview}
                                 </Typography>
                             )}
+
+                            <Button
+                                variant="contained"
+                                size="large"
+                                onClick={() => router.push(`/overview/reservation?movieId=${movie.id}`)}
+                                sx={{
+                                    mt: 3,
+                                    backgroundColor: '#4CAF50',
+                                    '&:hover': {
+                                        backgroundColor: '#45a049',
+                                    },
+                                    padding: '12px 32px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                Reserve Seats
+                            </Button>
                         </Stack>
                     </Box>
                 </Box>
 
                 {cast.length > 0 && (
-                    <Box sx={{ py: 4, position: "relative" }}>
+                    <Box sx={{py: 4, position: "relative"}}>
                         <Typography variant="h5" fontWeight="bold" mb={2}>
                             Cast
                         </Typography>
@@ -185,10 +206,10 @@ const MovieDetailPage = () => {
                                 transform: "translateY(-50%)",
                                 zIndex: 10,
                                 bgcolor: "rgba(0,0,0,0.5)",
-                                "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
+                                "&:hover": {bgcolor: "rgba(0,0,0,0.8)"},
                             }}
                         >
-                            <ArrowBackIos sx={{ color: "#fff" }} />
+                            <ArrowBackIos sx={{color: "#fff"}}/>
                         </IconButton>
 
                         {/* Cast Cards Container */}
@@ -201,13 +222,13 @@ const MovieDetailPage = () => {
                                 scrollBehavior: "smooth",
                                 px: 6,
                                 /* Hide scrollbar */
-                                "&::-webkit-scrollbar": { display: "none" }, // Chrome, Safari
+                                "&::-webkit-scrollbar": {display: "none"}, // Chrome, Safari
                                 scrollbarWidth: "none", // Firefox
                             }}
                         >
                             {cast.map((actor) => (
-                                <Box key={actor.id} sx={{ flex: "0 0 auto", scrollSnapAlign: "start" }}>
-                                    <CastCard actor={actor} />
+                                <Box key={actor.id} sx={{flex: "0 0 auto", scrollSnapAlign: "start"}}>
+                                    <CastCard actor={actor}/>
                                 </Box>
                             ))}
                         </Box>
@@ -222,15 +243,15 @@ const MovieDetailPage = () => {
                                 transform: "translateY(-50%)",
                                 zIndex: 10,
                                 bgcolor: "rgba(0,0,0,0.5)",
-                                "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
+                                "&:hover": {bgcolor: "rgba(0,0,0,0.8)"},
                             }}
                         >
-                            <ArrowForwardIos sx={{ color: "#fff" }} />
+                            <ArrowForwardIos color="inherit" />
                         </IconButton>
                     </Box>
                 )}
             </Container>
-        </Box>
+        </Box></>
     );
 };
 
