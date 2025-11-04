@@ -6,6 +6,7 @@ import {Grid, Typography, Box, Pagination} from "@mui/material";
 import {MovieResponseDTO, getAllMovies, PageResponseDTO} from "@/service/movieService";
 import '../globals.css';
 import {useRouter} from "next/navigation";
+import Navbar from "@/components/organisms/Navbar";
 
 export default function CinemaOverview() {
     const [movies, setMovies] = useState<MovieResponseDTO[]>([]);
@@ -48,7 +49,9 @@ export default function CinemaOverview() {
     }
 
     return (
-        <Box sx={{backgroundColor: "#36304E", minHeight: "100vh", py: 6, display: "flex", justifyContent: "center"}}>
+        <>
+            <Navbar/><Box
+            sx={{backgroundColor: "#36304E", minHeight: "100vh", py: 6, display: "flex", justifyContent: "center"}}>
             <Box sx={{p: 4, width: '100%', maxWidth: 1400}}>
                 <Typography
                     variant="h3"
@@ -62,21 +65,34 @@ export default function CinemaOverview() {
                 <Grid container spacing={4}>
                     {movies.map((movie) => (
                         <MovieCard
+                            key={movie.id}
                             path={getImageUrl(movie.posterPath)}
-                            onClick={() => router.push(`/movie/${movie.id}`)}
-                        />
+                            onClick={() => router.push(`/movie/${movie.id}`)}/>
                     ))}
                 </Grid>
 
-                <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
+                <Box sx={{
+                    display: "flex", justifyContent: "center", mt: 6,
+                    "& .MuiPaginationItem-page.Mui-selected": {
+                        bgcolor: "#1976d2",
+                        color: "#fff",
+                    },
+                    "& .MuiPaginationItem-previousNext": {
+                        bgcolor: "rgba(255,255,255,0.1)",
+                        "&:hover": {
+                            bgcolor: "rgba(255,255,255,0.3)",
+                        },
+                    },
+                }}>
                     <Pagination
                         count={totalPages}
                         page={currentPage + 1}
                         onChange={(event, value) => fetchMovies(value - 1)} // convert to 0-based
-                        color="primary"
-                    />
+                        color="primary"/>
                 </Box>
+
             </Box>
         </Box>
+        </>
     );
 }
